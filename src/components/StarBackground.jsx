@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 export const StarBackground = () => {
     const [stars, setStars] = useState([]);
     // Dummy state to force re-render on theme change
-    const [themeVersion, setThemeVersion] = useState(0);
+    const [/* themeVersion */, setThemeVersion] = useState(0);
 
     useEffect(() => { 
         createStar();

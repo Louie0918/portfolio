@@ -1,3 +1,5 @@
+import { StarBackground } from "../components/StarBackground";
+
 export const NotFound = () => {
     // Custom 404 page with improved styling and helpful message
     return (
@@ -42,6 +44,7 @@ export const NotFound = () => {
             >
                 Return Home
             </a>
+            <StarBackground />
         </div>
     );
 };
