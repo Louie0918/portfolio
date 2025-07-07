@@ -4,21 +4,30 @@ import { useEffect, useState } from 'react';
 
 export const StarBackground = () => {
     const [stars, setStars] = useState([]);
-    const [isDarkMode, setIsDarkMode] = useState(
-        document.documentElement.classList.contains('dark')
-    );
+    // Dummy state to force re-render on theme change
+    const [themeVersion, setThemeVersion] = useState(0);
 
     useEffect(() => { 
         createStar();
 
-        // Listen for class changes on <html> to update star color dynamically
+        // Re-create stars on resize (optional, for responsiveness)
+        const handleResize = () => createStar();
+        window.addEventListener('resize', handleResize);
+
+        // MutationObserver to watch for theme changes
         const observer = new MutationObserver(() => {
-            setIsDarkMode(document.documentElement.classList.contains('dark'));
+            setThemeVersion(v => v + 1); // force re-render
         });
         observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
-        return () => observer.disconnect();
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            observer.disconnect();
+        };
     }, []); 
+
+    // Always get the current theme at render time
+    const isDarkMode = document.documentElement.classList.contains('dark');
 
     const createStar = () => {
         const numberOfStars = Math.floor(
@@ -40,20 +49,25 @@ export const StarBackground = () => {
 
         setStars(newStars);
     };
+
     return (
-    <div className='fixed inset-0 overflow-none pointer-events-none z-0'>
-        {" "}
-        {stars.map((star) => (
-            <div key={star.id} className='star animate-pulse-subtle' style={{
-                width: star.size + "px",
-                height: star.size + "px",
-                left: star.x + "%",
-                top: star.y + "%",
-                opacity: star.opacity,
-                animationDuration: star.animationDuration + "s",
-                background: isDarkMode ? "#fff" : "#000",
-            }}/>
-        ))}
-    </div>
+        <div className='fixed inset-0 overflow-none pointer-events-none z-0'>
+            {stars.map((star) => (
+                <div
+                    key={star.id}
+                    className='star animate-pulse-subtle'
+                    style={{
+                        width: star.size + "px",
+                        height: star.size + "px",
+                        left: star.x + "%",
+                        top: star.y + "%",
+                        opacity: star.opacity,
+                        animationDuration: star.animationDuration + "s",
+                        // If dark mode, stars are white; if light mode, stars are black
+                        background: isDarkMode ? "#fff" : "#000",
+                    }}
+                />
+            ))}
+        </div>
     );
 };
